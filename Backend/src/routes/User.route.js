@@ -14,6 +14,8 @@ import {
   searchUser,
 } from "../controllers/User.controllers.js";
 import { jwtVerification } from "../middleware/Auth.middleware.js";
+import { conversation,allConversation } from "../controllers/Message.controllers.js";
+
 const userRoute = Router();
 
 userRoute.route("/register").post(registerUser);
@@ -35,6 +37,10 @@ userRoute.route("/update-userinfo").post(jwtVerification, updateUserInfo);
 userRoute.route("/delete-profilephoto").post(jwtVerification, deleteProfilePhoto);
 userRoute.route("/me").get(jwtVerification, currentUser);
 userRoute.route("/profile/:id").get(userInfo);
-userRoute.route("/search").get(searchUser);
+userRoute.route("/search").post(jwtVerification,searchUser);
+
+//Conversation
+userRoute.route("/conversation/:id").get(jwtVerification,conversation)
+userRoute.route("/chats").get(jwtVerification,allConversation)
 
 export { userRoute };

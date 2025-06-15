@@ -7,8 +7,8 @@ const limit = "16kb";
 
 app.use(
   cors({
-    // origin: "http://localhost:5173",
-    origin: process.env.ORIGIN,
+    origin: "http://localhost:5173",
+    // origin: process.env.ORIGIN,
     credentials: true,
   })
 );

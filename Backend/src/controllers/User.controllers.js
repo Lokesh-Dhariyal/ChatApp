@@ -78,6 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password: hashedPassword,
     profilePhoto:
       "https://res.cloudinary.com/dhzxvjygz/image/upload/v1748512530/userImage_abfe44.png",
+    online:true,
   });
 
   const { refreshToken, accessToken } = await generateAccessAndRefreshTokens(
@@ -122,7 +123,10 @@ const loginUser = asyncHandler(async (req, res) => {
     user.username
   );
 
-  const logginedUser = await User.findById(user._id).select(
+  const logginedUser = await User.findByIdAndUpdate(user._id,
+    {online:true},
+    {new:true}
+  ).select(
     "-password -refreshToken"
   );
 
@@ -146,10 +150,11 @@ const loginUser = asyncHandler(async (req, res) => {
 //⁡⁢⁢⁢𝗟𝗼𝗴𝗼𝘂𝘁 𝗨𝘀𝗲𝗿⁡
 const logoutUser = asyncHandler(async (req, res) => {
   const user = req.user;
-  await User.findByIdAndUpdate(
+  const userOut = await User.findByIdAndUpdate(
     user._id,
     {
-      $unset: { refreshToken: "" },
+      online: false ,
+      $unset: { refreshToken: "" }
     },
     {
       new: true,
@@ -160,7 +165,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(new apiResponse(200, {}, "User logout successfully"));
+    .json(new apiResponse(200, userOut, "User logout successfully"));
 });
 
 //⁡⁢⁢⁢𝗨𝗽𝗱𝗮𝘁𝗲 𝗧𝗼𝗸𝗲𝗻𝘀 𝗪𝗵𝗲𝗻 𝗼𝗽𝗲𝗻𝗶𝗻𝗴 𝘁𝗵𝗲 𝗮𝗽𝗽⁡
@@ -386,6 +391,7 @@ const searchUser = asyncHandler(async (req, res) => {
   const regex = new RegExp(search, "i"); // i, for case insensitive
 
   const user = await User.find({
+    _id: { $ne: req.user._id },
     $or: [{ username: { $regex: regex } }, { fullName: { $regex: regex } }],
   }).select("_id username fullName profilePhoto");
 

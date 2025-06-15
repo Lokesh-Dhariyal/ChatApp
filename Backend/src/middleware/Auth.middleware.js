@@ -1,7 +1,6 @@
-import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/AsyncHandler.utils.js";
 import { apiError } from "../utils/ApiError.utils.js";
-import { User } from "../models/User.model.js";
+import { verifyToken } from "../utils/VerifyTokens.utils.js";
 
 const jwtVerification = asyncHandler(async (req, _, next) => {
   try {
@@ -13,14 +12,7 @@ const jwtVerification = asyncHandler(async (req, _, next) => {
       throw new apiError(400, "Invalid Token");
     }
 
-    const checkedToken = jwt.verify(
-      accessToken,
-      process.env.ACCESS_TOKEN_SECRET
-    ); //gives the parameter that is passed
-
-    const user = await User.findById(checkedToken._id).select(
-      "-password -refreshToken"
-    );
+    const user = await verifyToken(accessToken)
     if (!user) {
       throw new apiError(400, "Invalid Access Token");
     }
