@@ -11,6 +11,7 @@ function ChatPage() {
   const [text, setText] = useState('');
   const { userId } = useParams();
   const [userData, setUserData] = useState({});
+  const [isOnline,setIsOnline] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,6 +23,7 @@ function ChatPage() {
     };
     fetchData();
   }, [userId]);
+
 
   const handelSubmit = (e) => {
     e.preventDefault();
@@ -64,20 +66,24 @@ function ChatPage() {
             />
           </svg>
         </Link>
-        <img
-          src={userData?.profilePhoto || '/default.png'}
-          alt={userData?.username}
-          className="w-12 h-12 rounded-full object-cover border border-white"
-        />
+        
+        <div className="relative w-12 h-12">
+          <img
+            src={userData?.profilePhoto}
+            alt={userData?.username}
+            className="w-full h-full rounded-full object-cover border border-white"
+          />
+          
+          <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border border-black"
+              style={{ backgroundColor: userData?.online ? '#84cc16' : '#ef4444' }}>
+          </div>
+        </div>
+        
         <div>
           <h2 className="text-lg font-semibold">{userData?.fullName || 'User'}</h2>
           <p className="text-sm text-gray-400">@{userData?.username}</p>
         </div>
-        {userData?.online?(<div className='h-full pt-2'>
-          <div className='w-3 h-3 rounded-full bg-lime-500'></div>
-        </div>):(<div className='h-full pt-8'>
-          <div className='w-3 h-3 rounded-full bg-red-500'></div>
-        </div>)}
+        
       </motion.div>
 
       {/* Messages */}

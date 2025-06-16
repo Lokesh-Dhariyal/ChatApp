@@ -3,7 +3,7 @@ import App from "../App.jsx"
 import { useUser } from "../hooks/useUser.js";
 import { useEffect } from "react";
 import { LoadingPage } from "../pages/LoadingPage.jsx";
-import { RegisterPage } from "../Pages/RegisterPage.jsx";
+import { RegisterPage } from "../pages/RegisterPage.jsx";
 import { LoginPage } from "../pages/LoginPage.jsx";
 import { HomePage } from "../pages/HomePage.jsx";
 import { ChatPage } from "../pages/ChatPage.jsx";

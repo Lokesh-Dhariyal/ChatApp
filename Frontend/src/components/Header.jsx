@@ -19,17 +19,16 @@ export function Header() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, type: "spring", stiffness: 80 }}
-      className="w-full px-6 md:px-12 py-4 bg-black fixed top-0 z-50 bg-opacity-60 border-b border-white/20"
+      className="w-full px-6 md:px-12 py-2 bg-black fixed top-0 z-50 bg-opacity-60 border-b border-white/20"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <motion.h1
+      <Link to={"/"}><motion.img
+          src="/logo.png"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 100, delay: 0.3 }}
-          className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-gray-500 via-gray-400 to-gray-500 text-transparent bg-clip-text"
-        >
-          Chatwa
-        </motion.h1>
+          className="w-14 lg:w-17 h-12 lg:h-15 rounded-xl"
+        /></Link>
 
         {!loading&&(isAuthenticated?(
           <motion.nav
@@ -52,7 +51,8 @@ export function Header() {
           </Link>
           <button
             onClick={handelLogout}
-            className="px-2 lg:px-6 py-1 lg:py-3 rounded-lg border border-white text-white font-semibold text-lg shadow-lg hover:shadow-white/10 transition-all duration-300 hover:bg-white hover:text-black"
+            className="px-2 lg:px-6 py-1 lg:py-3 rounded-lg lg:border bg-white lg:bg-black border-white text-black lg:text-white font-semibold lg:text-lg shadow-lg hover:shadow-white/10 transition-all 
+            duration-300 hover:bg-white hover:text-black hover:cursor-pointer"
           >
             Logout
           </button>
@@ -75,8 +75,16 @@ export function Header() {
           >
             Register
           </Link>
-        <a href="https://www.lokeshdhariyal.me/" target="_blank"  className=" text-[#bdbcbc] hover:text-[#a8a8a8]">
-                Portfolio
+        <a href="https://www.lokeshdhariyal.me/" target="_blank">
+              <button type="button"
+                className="inline-flex p-0.5 mb-2 text-sm font-medium text-white rounded-full bg-gradient-to-br from-blue-400 to-blue-800 hover:from-blue-800 hover:to-blue-400 hover:text-white hover:cursor-pointer"
+              >
+                <span
+                  className="px-5 py-2.5 bg-black rounded-full"
+                >
+                  Portfolio
+                </span>
+              </button>
             </a>
         </motion.nav>))}
         

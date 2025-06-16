@@ -22,7 +22,6 @@ export function AllChatsPage() {
       const getData = async()=>{
         await currentUser()
         const chat = await allChats()
-        console.log(chat)
         setChats(chat.data)
         setMessages([])
       }

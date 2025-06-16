@@ -7,7 +7,6 @@ const SocketContext = createContext();
 export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
-  const [isConnected, setIsConnected] = useState(false);
   const [messages,setMessages] = useState([])
   const {user} = useUser()
   const [typingUser, setTypingUser] = useState(null);
@@ -16,15 +15,6 @@ export const SocketProvider = ({ children }) => {
     if(user&&socket.disconnected){
       socket.connect()
     }
-    const onConnect = () => {
-      console.log("🟢 Socket Connected");
-      setIsConnected(true);
-    };
-
-    const onDisconnect = () => {
-      console.log("🔴 Socket Disconnected");
-      setIsConnected(false);
-    };
     const receiveMessage = (msg)=>{
         setMessages((prev) => [...prev, msg]);
     }
@@ -34,14 +24,14 @@ export const SocketProvider = ({ children }) => {
       setTimeout(() => setTypingUser(null), 2000);
     }
 
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+    socket.on("connect",()=>null);
+    socket.on("disconnect",()=>null);
     socket.on("receive-message",receiveMessage)
     socket.on("show-typing",typingUser)
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
+      socket.off("connect",()=>null);
+      socket.off("disconnect",()=>null);
       socket.off("receive-message",receiveMessage)
       socket.off("show-typing",typingUser)
     }
@@ -62,7 +52,7 @@ export const SocketProvider = ({ children }) => {
   }
   
   return (
-    <SocketContext.Provider value={{ socket, isConnected, sendMessage, setMessages,messages,typing, typingUser, setTypingUser }}>
+    <SocketContext.Provider value={{ socket, sendMessage, setMessages,messages,typing, typingUser, setTypingUser }}>
       {children}
     </SocketContext.Provider>
   );
