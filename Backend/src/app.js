@@ -7,7 +7,8 @@ const limit = "16kb";
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    // origin: "http://localhost:5173",
+    origin: "https://batuni.vercel.app",
     // origin: process.env.ORIGIN,
     credentials: true,
   })

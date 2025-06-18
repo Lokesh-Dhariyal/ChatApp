@@ -40,9 +40,9 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const options = {
   httpOnly: true,
-//   secure: process.env.NODE_ENV === "production",
-  secure:false,
-//   sameSite: "None",
+  secure: process.env.NODE_ENV === "production",
+  // secure:false,
+  sameSite: "None",
 };
 
 //⁡⁣⁣⁢⁡⁢⁢⁢𝗥𝗲𝗴𝗶𝘀𝘁𝗲𝗿 𝗨𝘀𝗲𝗿⁡(avatar will be added in the update user section as it is not needed while registration)
