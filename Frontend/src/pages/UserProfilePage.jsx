@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 function UserProfilePage() {
-  const {user,loading, currentUser,updateProfilePhoto,changePassword} = useUser();
+  const {user,loading, currentUser,updateProfilePhoto,changePassword,updateUserInfo} = useUser();
   useEffect(()=>{ currentUser() },[])
 
   const [upload,setUpload] = useState(false)
@@ -32,6 +32,10 @@ function UserProfilePage() {
   const [passwordUploading,setPasswordUploading] = useState(false)
   const [formPassword, setFormPassword] = useState({ previousPassword:"", newPassword:"" })
 
+  const [showUserInfo,setShowUserInfo] = useState(false)
+  const [InfoUploading,setInfoUploading] = useState(false)
+  const [formInfo,setFormInfo] = useState({fullName:user?.fullName,email:user?.email})
+
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setFormPassword((prev) => ({ ...prev, [name]: value }));
@@ -46,10 +50,29 @@ function UserProfilePage() {
     navigate("/home")
   };
 
+  const handleInfoSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordUploading(true)
+    await updateUserInfo(formInfo);
+    setInfoUploading(false);
+    setShowUserInfo(false);
+    navigate("/home")
+  };
+
+  const handleInfoChange = (e) =>{
+    const {name,value} = e.target;
+    setFormInfo((prev)=>({...prev,[name]:value}))
+}
+
   if(loading||!user) return <LoadingPage/>
 
   return (
-    <div className="min-h-screen pt-22  text-white">
+    <motion.div className="min-h-screen pt-22  text-white"
+      initial={{ y: -50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: -50, opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="w-11/12 mx-auto py-10 px-4 flex flex-col lg:flex-row gap-10 border border-white/10 rounded-3xl shadow-2xl">
 
         <div onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)} className="relative w-[280px] h-[280px] mx-auto">
@@ -81,7 +104,7 @@ function UserProfilePage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
                 transition={{ duration: 0.4 }}
-                className="mt-5 w-full text-center"
+                className="mt-5 w-full text-center backdrop-blur-md"
               >
                 <input 
                   ref={inputRef}
@@ -104,8 +127,10 @@ function UserProfilePage() {
           <h2 className="text-4xl font-extrabold tracking-wide text-gray-300">{user.fullName}</h2>
           <p className="text-xl text-gray-400">@{user.username}</p>
         </div>
+        
 
-        <div className="w-full max-w-md h-fit mx-auto lg:mx-0 text-white bg-white/10 rounded-2xl p-6 shadow-xl">
+        <div className="w-full max-w-md">
+        <div className="w-full max-w-md h-fit mx-auto lg:mx-0 text-white bg-white/10 rounded-2xl p-6 shadow-xl mb-5">
           <button
             type="button"
             onClick={() => setShowUserPassword(!showUserPassword)}
@@ -156,8 +181,61 @@ function UserProfilePage() {
             )}
           </AnimatePresence>
         </div>
+
+        <div className="w-full max-w-md h-fit mx-auto lg:mx-0 text-white bg-white/10 rounded-2xl p-6 shadow-xl">
+          <button
+            type="button"
+            onClick={() => setShowUserInfo(!showUserInfo)}
+            className="h-10 w-full py-2 px-4 bg-gray-300 hover:bg-gray-400 text-black rounded-md shadow transition duration-300"
+          >
+            {showUserInfo ? "Cancel" : "Update Info"}
+          </button>
+
+          <AnimatePresence>
+            {showUserInfo && (
+              <motion.form
+                onSubmit={handleInfoSubmit}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.4 }}
+                className="mt-6 space-y-4"
+              >
+                <div>
+                  <label htmlFor="fullName" className="block mb-1 text-sm font-semibold">Full Name:</label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    className="w-full pl-3 pr-3 py-2 border border-white/30 rounded-lg text-gray-200 bg-black placeholder-gray-500 focus:outline-none"
+                    placeholder={user.fullName}
+                    onChange={handleInfoChange}
+                    value={formInfo.fullName}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block mb-1 text-sm font-semibold">Email :</label>
+                  <input
+                    type="text"
+                    name="email"
+                    className="w-full pl-3 pr-3 py-2 border border-white/30 rounded-lg text-gray-200 bg-black placeholder-gray-500 focus:outline-none"
+                    placeholder={user.email}
+                    onChange={handleInfoChange}
+                    value={formInfo.email}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="h-10 w-full py-2 px-4 bg-green-500 hover:bg-green-600 text-black rounded-md shadow transition duration-300"
+                >
+                  {InfoUploading ? "Updating..." : "Update Info"}
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+        </div>
+        </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

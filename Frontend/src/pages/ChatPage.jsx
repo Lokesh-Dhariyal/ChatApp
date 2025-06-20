@@ -11,7 +11,7 @@ function ChatPage() {
   const [text, setText] = useState('');
   const { userId } = useParams();
   const [userData, setUserData] = useState({});
-  const [isOnline,setIsOnline] = useState(false)
+  const [showUserData,setShowUserData] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +38,13 @@ function ChatPage() {
   
 
   return (
-    <div className="lg:w-5/6 mx-auto h-screen bg-black text-white flex flex-col pt-18 lg:pt-21 pb-2 lg:px-4">
+    <div className="lg:w-5/6 mx-auto h-screen bg-black text-white flex flex-col pt-18 lg:pt-21 pb-2 lg:px-4"
+      onClick={()=>{
+        if(showUserData){
+          setShowUserData(false)
+        }
+      }}
+    >
       
       {/* Header */}
       <motion.div
@@ -67,7 +73,9 @@ function ChatPage() {
           </svg>
         </Link>
         
-        <div className="relative w-12 h-12">
+        <div className="relative w-12 h-12 hover:cursor-pointer"
+          onClick={()=>setShowUserData(!showUserData)}
+          >
           <img
             src={userData?.profilePhoto}
             alt={userData?.username}
@@ -79,12 +87,41 @@ function ChatPage() {
           </div>
         </div>
         
-        <div>
+        <div onClick={()=>setShowUserData(!showUserData)} className='hover:cursor-pointer'>
           <h2 className="text-lg font-semibold">{userData?.fullName || 'User'}</h2>
           <p className="text-sm text-gray-400">@{userData?.username}</p>
         </div>
         
       </motion.div>
+
+      <AnimatePresence>
+        {showUserData && (
+          <motion.div
+            className="absolute border border-white/20 rounded-3xl lg:h-60 lg:w-120 mt-15 lg:mt-17 ml-1 p-5 flex backdrop-blur-3xl lg:backdrop-blur-md"
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              className="w-35 h-35 lg:w-50 lg:h-50 border border-white rounded-full overflow-hidden"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <img
+                src={userData?.profilePhoto}
+                alt={userData?.username}
+                className="w-full h-full rounded-full object-cover border-4 border-white shadow-lg"
+              />
+            </motion.div>
+            <div className="mx-8 mt-10">
+              <h2 className="text-4xl font-extrabold tracking-wide text-gray-300">{userData?.fullName}</h2>
+              <p className="text-xl text-gray-400">@{userData?.username}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
       {/* Messages */}
       <div className="flex-1 overflow-y-scroll px-2 py-4 space-y-3 custom-scrollbar ">
