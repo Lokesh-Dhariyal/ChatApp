@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useUser } from '../hooks/useUser';
 import { useSocket } from '../Features/socketContext';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 function ChatPage() {
-  const { currentUser, user, conversation, someUser } = useUser();
+  const { currentUser, user, conversation, someUser, deleteChat } = useUser();
   const { sendMessage, messages, setMessages, typing, typingUser } = useSocket();
   const [text, setText] = useState('');
   const { userId } = useParams();
   const [userData, setUserData] = useState({});
   const [showUserData,setShowUserData] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,14 +98,14 @@ function ChatPage() {
       <AnimatePresence>
         {showUserData && (
           <motion.div
-            className="absolute border border-white/20 rounded-3xl lg:h-60 lg:w-120 mt-15 lg:mt-17 ml-1 p-5 flex backdrop-blur-3xl lg:backdrop-blur-md"
+            className="absolute border border-white/20 rounded-3xl lg:h-60 w-fit mt-15 lg:mt-17 ml-1 p-5 flex backdrop-blur-3xl lg:backdrop-blur-md"
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -50, opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
             <motion.div
-              className="w-35 h-35 lg:w-50 lg:h-50 border border-white rounded-full overflow-hidden"
+              className="w-30 h-30 lg:w-50 lg:h-50 border border-white rounded-full overflow-hidden"
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
             >
@@ -114,11 +115,19 @@ function ChatPage() {
                 className="w-full h-full rounded-full object-cover border-4 border-white shadow-lg"
               />
             </motion.div>
-            <div className="mx-8 mt-10">
-              <h2 className="text-4xl font-extrabold tracking-wide text-gray-300">{userData?.fullName}</h2>
-              <p className="text-xl text-gray-400">@{userData?.username}</p>
+            <div className="lg:mx-8 mx-2 mt-10">
+              <h2 className="text-xl lg:text-4xl font-extrabold tracking-wide text-gray-300">{userData?.fullName}</h2>
+              <p className="lg:text-xl text-gray-400">@{userData?.username}</p>
             </div>
+            <div
+              onClick={async()=>{
+                await deleteChat(userData?._id)
+                navigate('/chat')
+              }}
+              className='border border-black w-fit h-10 ml-auto rounded-2xl pt-2 pb-3 px-3 bg-red-600 text-black font-semibold hover:border-white/10 hover:bg-red-500 cursor-pointer'>
+              Delete Chat</div>
           </motion.div>
+          
         )}
       </AnimatePresence>
 
@@ -132,7 +141,7 @@ function ChatPage() {
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -10, opacity: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
               className={`lg:max-w-[35%] max-w-[80%] w-fit h-fit px-4 py-2 rounded-xl break-words ${
                 m.sender === user?._id
                   ? 'ml-auto bg-white text-black'
@@ -178,7 +187,7 @@ function ChatPage() {
         />
         <motion.button
           type="submit"
-          className="bg-white text-black px-4 py-2 rounded-xl hover:bg-gray-200 transition"
+          className="bg-white text-black px-4 py-2 rounded-xl hover:bg-gray-200 transition cursor-pointer"
           whileTap={{ scale: 0.95 }}
         >
           Send

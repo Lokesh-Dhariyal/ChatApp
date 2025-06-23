@@ -10,7 +10,7 @@ export function Header() {
   const handelLogout = async()=>{
     const res = await logout()
     if(res.success){
-      navigate("/login")
+      navigate("/")
     }
   }
 

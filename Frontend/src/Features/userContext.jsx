@@ -168,6 +168,102 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const createGroup = async(data)=>{
+    try {
+      const res = await axios.post('/group/create',data);
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  const allGroups = async()=>{
+    try {
+      const res = await axios.get('/group/groups');
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  const groupChat = async(groupId)=>{
+    try {
+      const res = await axios.get(`/group/${groupId}/chat`);
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  const groupData = async(groupId)=>{
+    try {
+      const res = await axios.get(`/group/${groupId}/data`);
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  const deleteChat = async(userId)=>{
+    try {
+      const res = await axios.post(`/user/conversation/${userId}/delete-chat`);
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  const leaveGroup = async(groupId)=>{
+    try {
+      const res = await axios.post(`/group/${groupId}/leave`);
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  const updateGroupPhoto = async(groupId,formData)=>{
+    try {
+      const res = await axios.post(`/group/${groupId}/photo`,formData);
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  }
+
+  const deleteUser = async()=>{
+    try {
+      const res = await axios.post('/user/delete');
+      return res.data;
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || error.message,
+      };
+    }
+  } 
+
   return (
     <AuthContext.Provider
       value={{
@@ -187,7 +283,15 @@ export const AuthProvider = ({ children }) => {
         updateUserInfo,
         changePassword,
         conversation,
-        allChats
+        allChats,
+        createGroup,
+        allGroups,
+        groupChat,
+        groupData,
+        deleteChat,
+        leaveGroup,
+        updateGroupPhoto,
+        deleteUser
       }}
     >
       {children}

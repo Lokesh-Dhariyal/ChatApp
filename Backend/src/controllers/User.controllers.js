@@ -13,6 +13,9 @@ import { apiResponse } from "../utils/ApiResponse.utils.js";
 import { asyncHandler } from "../utils/AsyncHandler.utils.js";
 import { User } from "../models/User.model.js";
 import jwt from "jsonwebtoken";
+import { Message } from "../models/Message.model.js";
+import { Group } from "../models/Group.model.js";
+import { Groupmessage } from "../models/GroupMessage.model.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -404,16 +407,51 @@ const searchUser = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, user, "Users fetched successfully"));
 });
 
+const deleteUser = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  await Message.deleteMany({
+    $or: [{ receiver: userId }, { sender: userId }],
+  });//deleteMessage
+
+  await Group.updateMany(
+    { members: userId },
+    { $pull: { members: userId } }
+  );//remove from group
+
+  const groupsToDelete = await Group.find({ members: { $size: 0 } });
+  for (const group of groupsToDelete) {
+    await Group.findByIdAndDelete(group._id);
+  }
+
+  await Groupmessage.deleteMany({
+    senderId: userId,
+  });//deleteGroupMessage
+
+  const deletedUser = await User.findByIdAndDelete(userId);
+  if (!deletedUser) {
+    throw new apiError(500, "Something went wrong while deleting the user");
+  }
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new apiResponse(200, {}, "User deleted successfully"));
+});
+
+
 export {
-    registerUser,
-    loginUser,
-    logoutUser,
-    updateToken,
-    changePassword,
-    updateProfilePhoto,
-    updateUserInfo,
-    deleteProfilePhoto,
-    currentUser,
-    userInfo,
-    searchUser,
-}
+  registerUser,
+  loginUser,
+  logoutUser,
+  updateToken,
+  changePassword,
+  updateProfilePhoto,
+  updateUserInfo,
+  deleteProfilePhoto,
+  currentUser,
+  userInfo,
+  searchUser,
+  deleteUser,
+};

@@ -49,23 +49,28 @@ const allConversation = asyncHandler(async (req, res) => {
     userIds.add(msg.sender);
   });
 
-  if (userIds.size === 0) {
-    throw new apiError(400, "No chats found");
-  }
-
-  const allConversation = await User.find({
+  const finalConvo = await User.find({
     _id: { $in: Array.from(userIds) },
   }).select("_id username fullName profilePhoto");
 
   return res
     .status(200)
-    .json(
-      new apiResponse(200, allConversation, "Successfully fetched the chats")
-    );
+    .json(new apiResponse(200, finalConvo, "Successfully fetched the chats"));
 });
 
+const deleteChat = asyncHandler(async(req,res)=>{
+  const userId = req.params.id
+  const currentUserId = req.user._id
+  await Message.deleteMany({
+    $or: [
+      { receiver: userId, sender: currentUserId },
+      { receiver: currentUserId, sender: userId },
+    ],
+  })
+
+  return res.status(200).json(new apiResponse(200,{},"Chat deleted successfully"))
+})
 
 
 
-
-export {saveMessage,conversation,allConversation}
+export { saveMessage, conversation, allConversation, deleteChat };

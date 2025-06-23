@@ -20,8 +20,10 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 import { userRoute } from "./routes/User.route.js";
+import { groupRoute } from "./routes/Group.route.js";
 
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/group",groupRoute)
 
 import { errorMiddleware } from "./middleware/Error.middleware.js";
 app.use(errorMiddleware);

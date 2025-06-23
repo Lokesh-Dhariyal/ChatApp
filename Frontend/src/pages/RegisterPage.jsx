@@ -67,6 +67,7 @@ export function RegisterPage() {
               placeholder={field.placeholder}
               onChange={handleChange}
               required
+              maxLength={20}
               className="w-full p-3 bg-black/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/70"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}

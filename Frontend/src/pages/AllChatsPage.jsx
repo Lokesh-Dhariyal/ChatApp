@@ -3,26 +3,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../hooks/useUser';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../Features/socketContext';
-
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.4, ease: 'easeOut' },
-  }),
-};
+import { UserCard } from '../components/UserCard';
+import { GroupCard } from '../components/GroupCard';
+import { LoadingPage } from './LoadingPage';
 
 export function AllChatsPage() {
-    const {searchUser,currentUser,allChats} = useUser()
+    const {searchUser,currentUser,allChats,allGroups,user,loading} = useUser()
     const {setMessages} = useSocket()
     const [chats,setChats] = useState([])
+    const [groups,setGroups] = useState([])
     useEffect(()=>{
       const getData = async()=>{
         await currentUser()
         const chat = await allChats()
+        const groups = await allGroups()
         setChats(chat.data)
+        setGroups(groups.data)
         setMessages([])
       }
       getData()
@@ -48,31 +44,10 @@ export function AllChatsPage() {
     
   }, [searchWord]);
 
-
-  const renderUserCard = (user, i) => (
-    <motion.div
-      key={user.username}
-      className="flex items-center p-4 rounded-xl bg-[#1a1a1a] hover:bg-[#2a2a2a] transition shadow-md cursor-pointer space-x-4"
-      custom={i}
-      variants={fadeIn}
-      initial="hidden"
-      animate="visible"
-      onClick={()=>navigate(`/chat/${user._id}`)}
-    >
-      <img
-        src={user.profilePhoto}
-        alt={user.username}
-        className="w-12 h-12 rounded-full object-cover border-2 border-white"
-      />
-      <div>
-        <p className="text-white font-semibold">{user.fullName}</p>
-        <p className="text-sm text-gray-400">@{user.username}</p>
-      </div>
-    </motion.div>
-  );
+  if(loading || !user)return <LoadingPage/>
 
   return (
-    <div className="bg-black text-white h-fit p-6 font-sans mt-22">
+    <div className="bg-black text-white h-fit p-1 lg:p-6 font-sans mt-22">
       <div className="max-w-4xl mx-auto space-y-6">
         <motion.h1
           className="text-3xl font-bold text-center"
@@ -88,11 +63,19 @@ export function AllChatsPage() {
           name='search'
           onChange={(e)=>setSearchWord(e.target.value)}
           placeholder="Search users..."
-          className="w-full p-3 rounded-xl bg-[#121212] text-white placeholder-gray-400 border border-[#2e2e2e] focus:outline-none focus:ring-2 focus:ring-white"
+          className="w-3/4 lg:w-5/6 p-3 rounded-xl bg-[#121212] text-white placeholder-gray-400 border border-[#2e2e2e] focus:outline-none focus:ring-2 focus:ring-white"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
         />
+
+        <motion.button 
+        className='border border-white text-black w-fit h-10 bg-white rounded-2xl text-xs lg:text-md font-semibold py-1 px-2 lg:px-2 ml-1 lg:mx-3 hover:bg-black hover:text-white transition ease-in-out hover:cursor-pointer'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        onClick={()=>{navigate('/create-group')}}
+        >Create Group</motion.button>
 
         <AnimatePresence>
           {searchWord && searchResults.length > 0 && (
@@ -103,15 +86,40 @@ export function AllChatsPage() {
               exit={{ opacity: 0 }}
             >
               <h2 className="text-xl font-semibold">Search Results</h2>
-              {searchResults.map(renderUserCard)}
+              {searchResults.map((user,i)=>(
+                <UserCard 
+                key={user._id || i}
+                user={user}/>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>
 
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold">Your Chats</h2>
+          <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          hidden={(chats?.length!=0||groups?.length!=0)||(searchResults?.length > 0 && searchWord)} 
+          className='text-6xl font-bold text-center pt-20'>No Chats
+          </motion.div>
+
+          <h2 hidden={!chats?.length!=0} className="text-xl font-semibold">Your Chats</h2>
           <AnimatePresence>
-            {chats?.map(renderUserCard)}
+            {chats?.map((user,i)=>(
+              <UserCard 
+              key={user._id || i}
+              user={user}/>
+            ))}
+          </AnimatePresence>
+
+          <h2 hidden={!groups?.length!=0} className="text-xl font-semibold">Your Groups</h2>
+          <AnimatePresence>
+            {groups?.map((group,i)=>(
+              <GroupCard 
+              key={group._id || i}
+              group={group}/>
+            ))}
           </AnimatePresence>
         </div>
       </div>

@@ -61,6 +61,7 @@ export function LoginPage() {
               name={field.name}
               placeholder={field.placeholder}
               onChange={handleChange}
+              maxLength={20}
               required
               className="w-full p-3 bg-black/70 text-white border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/70"
               initial={{ opacity: 0, x: -30 }}

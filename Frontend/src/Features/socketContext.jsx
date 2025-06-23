@@ -8,6 +8,7 @@ export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider = ({ children }) => {
   const [messages,setMessages] = useState([])
+  const [groupMessages,setGroupMessages] = useState([])
   const {user} = useUser()
   const [typingUser, setTypingUser] = useState(null);
 
@@ -19,6 +20,11 @@ export const SocketProvider = ({ children }) => {
         setMessages((prev) => [...prev, msg]);
     }
 
+    const receiveGroupMessage = (msg)=>{
+      if (msg.senderId?._id === user._id) return;
+      setGroupMessages((prev)=>[...prev,msg]);
+    }
+
     const typingUser = (fromUser)=>{
       setTypingUser(fromUser);
       setTimeout(() => setTypingUser(null), 2000);
@@ -27,12 +33,14 @@ export const SocketProvider = ({ children }) => {
     socket.on("connect",()=>null);
     socket.on("disconnect",()=>null);
     socket.on("receive-message",receiveMessage)
+    socket.on("receivegroup-message",receiveGroupMessage)
     socket.on("show-typing",typingUser)
 
     return () => {
       socket.off("connect",()=>null);
       socket.off("disconnect",()=>null);
       socket.off("receive-message",receiveMessage)
+      socket.off("receivegroup-message",receiveGroupMessage)
       socket.off("show-typing",typingUser)
     }
   }, [user?._id]);
@@ -50,9 +58,40 @@ export const SocketProvider = ({ children }) => {
   const typing = (toUserId)=>{
    socket.emit("typing",toUserId)   
   }
+
+  const joinRoom = (groupId)=>{
+    socket.emit("join-room",groupId)
+  }
+
+  const sendGroupMessage = (groupId,content) =>{
+    socket.emit("groupmessage",{groupId,content});
+    setGroupMessages((prev) => [
+      ...prev,
+      {
+        groupId,
+        senderId: {
+          _id: user._id,
+          fullName: user.fullName,
+          profilePhoto: user.profilePhoto,
+        },
+        content,
+      },
+    ]);
+  }
   
   return (
-    <SocketContext.Provider value={{ socket, sendMessage, setMessages,messages,typing, typingUser, setTypingUser }}>
+    <SocketContext.Provider value={{ 
+      socket, 
+      sendMessage, 
+      setMessages,
+      messages,
+      typing, 
+      typingUser, 
+      setTypingUser,
+      joinRoom,
+      sendGroupMessage,
+      setGroupMessages
+      ,groupMessages }}>
       {children}
     </SocketContext.Provider>
   );

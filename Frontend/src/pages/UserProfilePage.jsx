@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 function UserProfilePage() {
-  const {user,loading, currentUser,updateProfilePhoto,changePassword,updateUserInfo} = useUser();
+  const {user,loading, currentUser,updateProfilePhoto,changePassword,updateUserInfo,deleteUser} = useUser();
   useEffect(()=>{ currentUser() },[])
 
   const [upload,setUpload] = useState(false)
@@ -64,6 +64,23 @@ function UserProfilePage() {
     setFormInfo((prev)=>({...prev,[name]:value}))
 }
 
+  //delete Account
+  const [showDeleteAccout,setShowDeleteAccount]=useState(false)
+  const [deleteText,setDeleteText] = useState("")
+  const [deleting,setDeleting] = useState(false)
+
+  const handleDeleteSubmit=async(e)=>{
+    e.preventDefault()
+    setDeleting(true)
+    if(deleteText!==`${user.username} is so sad to go`){
+      alert("You are very sad")
+      return
+    }
+    await deleteUser()
+      navigate("/login")
+    setDeleteText(false)
+  }
+
   if(loading||!user) return <LoadingPage/>
 
   return (
@@ -73,7 +90,7 @@ function UserProfilePage() {
       exit={{ y: -50, opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="w-11/12 mx-auto py-10 px-4 flex flex-col lg:flex-row gap-10 border border-white/10 rounded-3xl shadow-2xl">
+      <div className="w-11/12 mx-auto lg:py-10 px-4 flex flex-col lg:flex-row gap-10 border border-white/10 rounded-3xl shadow-2xl">
 
         <div onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)} className="relative w-[280px] h-[280px] mx-auto">
           <motion.img
@@ -123,18 +140,18 @@ function UserProfilePage() {
           </AnimatePresence>
         </div>
 
-        <div className="flex-1 mt-5 space-y-4 text-center lg:text-left">
+        <div className="flex-1 lg:mt-5 space-y-4 text-center lg:text-left">
           <h2 className="text-4xl font-extrabold tracking-wide text-gray-300">{user.fullName}</h2>
           <p className="text-xl text-gray-400">@{user.username}</p>
         </div>
         
 
         <div className="w-full max-w-md">
-        <div className="w-full max-w-md h-fit mx-auto lg:mx-0 text-white bg-white/10 rounded-2xl p-6 shadow-xl mb-5">
+        <div className="w-full max-w-md h-fit mx-auto lg:mx-0 text-white bg-white/10 rounded-2xl p-4 shadow-xl mb-5">
           <button
             type="button"
             onClick={() => setShowUserPassword(!showUserPassword)}
-            className="h-10 w-full py-2 px-4 bg-gray-300 hover:bg-gray-400 text-black rounded-md shadow transition duration-300"
+            className="h-10 w-full py-2 px-4 cursor-pointer bg-gray-300 hover:bg-gray-400 text-black rounded-md shadow transition duration-300"
           >
             {showUserPassword ? "Cancel" : "Update Password"}
           </button>
@@ -173,7 +190,7 @@ function UserProfilePage() {
                 </div>
                 <button
                   type="submit"
-                  className="h-10 w-full py-2 px-4 bg-green-500 hover:bg-green-600 text-black rounded-md shadow transition duration-300"
+                  className="h-10 w-full py-2 px-4 cursor-pointer bg-green-500 hover:bg-green-600 text-black rounded-md shadow transition duration-300"
                 >
                   {passwordUploading ? "Updating..." : "Update Password"}
                 </button>
@@ -182,11 +199,11 @@ function UserProfilePage() {
           </AnimatePresence>
         </div>
 
-        <div className="w-full max-w-md h-fit mx-auto lg:mx-0 text-white bg-white/10 rounded-2xl p-6 shadow-xl">
+        <div className="w-full max-w-md h-fit mx-auto lg:mx-0 text-white bg-white/10 rounded-2xl p-4 shadow-xl">
           <button
             type="button"
             onClick={() => setShowUserInfo(!showUserInfo)}
-            className="h-10 w-full py-2 px-4 bg-gray-300 hover:bg-gray-400 text-black rounded-md shadow transition duration-300"
+            className="h-10 w-full py-2 px-4 cursor-pointer bg-gray-300 hover:bg-gray-400 text-black rounded-md shadow transition duration-300"
           >
             {showUserInfo ? "Cancel" : "Update Info"}
           </button>
@@ -225,7 +242,7 @@ function UserProfilePage() {
                 </div>
                 <button
                   type="submit"
-                  className="h-10 w-full py-2 px-4 bg-green-500 hover:bg-green-600 text-black rounded-md shadow transition duration-300"
+                  className="h-10 w-full py-2 px-4 cursor-pointer bg-green-500 hover:bg-green-600 text-black rounded-md shadow transition duration-300"
                 >
                   {InfoUploading ? "Updating..." : "Update Info"}
                 </button>
@@ -233,6 +250,42 @@ function UserProfilePage() {
             )}
           </AnimatePresence>
         </div>
+        <button
+            type="button"
+            onClick={() => setShowDeleteAccount(!showDeleteAccout)}
+            className="h-10 w-fit mx-2 py-2 mt-4 px-4 bg-red-400 hover:bg-red-500 cursor-pointer text-black rounded-md shadow transition duration-300"
+          >
+            {showDeleteAccout ? "Cancel" : "Delete Account"}
+          </button>
+          <AnimatePresence>
+            {showDeleteAccout && (
+              <motion.form
+                onSubmit={handleDeleteSubmit}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.4 }}
+                className="mt-6 space-y-4"
+              >
+                <div>
+                  <label htmlFor="delete" className="block mb-1 text-sm font-semibold">Type<strong className="text-red-400"> "{user.username} is so sad to go" </strong>in the given area</label>
+                  <input
+                    type="text"
+                    name="delete"
+                    className="w-full pl-3 pr-3 py-2 border border-white/30 rounded-lg text-gray-200 bg-black placeholder-gray-500 focus:outline-none"
+                    placeholder={`type here ${user.fullName}`}
+                    onChange={(e)=>setDeleteText(e.target.value)}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="h-10 w-1/3 py-2 px-4 bg-red-400 hover:bg-red-500 cursor-pointer text-black rounded-md shadow transition duration-300"
+                >
+                  {deleting?"Take Care" : "GoodBye"}
+                </button>
+              </motion.form>
+            )}
+            </AnimatePresence>
         </div>
       </div>
     </motion.div>
