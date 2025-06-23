@@ -9,7 +9,7 @@ import { HomePage } from "../pages/HomePage.jsx";
 import { ChatPage } from "../pages/ChatPage.jsx";
 import { UserProfilePage } from "../pages/UserProfilePage.jsx";
 import { AllChatsPage } from "../pages/AllChatsPage.jsx";
-import { CreateGroupPage } from "../pages/createGroupPage.jsx";
+import { CreateGroupPage } from "../pages/CreateGroupPage.jsx";
 import { GroupChatPage } from "../pages/GroupChatPage.jsx";
 
 function AuthRedirect() {
